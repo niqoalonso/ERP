@@ -105,6 +105,8 @@ export default {
           this.axios
             .get(`/api/verificarDocumentoFormulario/`+this.tipoDocumento+'/'+this.infoEmpresa.id_empresa)
             .then((res) => {
+              console.log(res);
+              // return;
                 if(res.data.estado == 1 && res.data.datos.length > 0){
                   this.tableDataDocumentos = res.data.datos; 
                   res.data.datos.map((p) => {

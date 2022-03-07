@@ -14,4 +14,5 @@ class ProductoProveedor extends Model
     protected $primaryKey = 'id_prod_proveedor';
 
     protected $fillable = ['nombre', 'sku', 'precio_neto', 'iva', 'precio_bruto', 'descripcion', 'proveedor_id', 'producto_id'];
+
 }

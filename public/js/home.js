@@ -3826,6 +3826,7 @@ __webpack_require__.r(__webpack_exports__);
       this.axios.get("/api/getDetalleExistencia/" + this.n_interno + '/' + this.infoEmpresa.id_empresa).then(function (res) {
         _this.form.documento = res.data.info.id_info;
         _this.form.empresa = _this.infoEmpresa.id_empresa;
+        console.log(res.data.detalles);
         _this.detalles = res.data.detalles;
         _this.documentoName = res.data.info.documento_tributario.descripcion;
         var info = {
@@ -4015,6 +4016,8 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       this.axios.get("/api/verificarDocumentoFormulario/" + this.tipoDocumento + '/' + this.infoEmpresa.id_empresa).then(function (res) {
+        console.log(res); // return;
+
         if (res.data.estado == 1 && res.data.datos.length > 0) {
           _this.tableDataDocumentos = res.data.datos;
           res.data.datos.map(function (p) {
@@ -4611,13 +4614,21 @@ __webpack_require__.r(__webpack_exports__);
             return false;
           }
 
+          var precio = 0;
+
+          if (_this2.formAddDetalle.detalle.precio_descuento == null) {
+            precio = _this2.formAddDetalle.detalle.precio;
+          } else {
+            precio = _this2.formAddDetalle.detalle.precio_descuento;
+          }
+
           var data = {
             'nombre': _this2.formAddDetalle.detalle.producto.nombre,
             'cantidad': _this2.formAddDetalle.cantidad,
             'precio': _this2.formAddDetalle.detalle.precio,
             'descuento_porcentaje': _this2.formAddDetalle.detalle.descuento_porcentaje,
             'precio_descuento': _this2.formAddDetalle.detalle.precio_descuento,
-            'total': _this2.formAddDetalle.detalle.precio * _this2.formAddDetalle.cantidad,
+            'total': precio * _this2.formAddDetalle.cantidad,
             'id_detalle': _this2.formAddDetalle.detalle.id_detalle,
             'producto_id': _this2.formAddDetalle.detalle.producto_id,
             'sku': _this2.formAddDetalle.detalle.sku,
@@ -4625,7 +4636,7 @@ __webpack_require__.r(__webpack_exports__);
             'centrocosto_id': _this2.formAddDetalle.detalle.centrocosto_id,
             'existencia_id': res.data.existencia_id
           };
-          _this2.m_afecto = _this2.m_afecto + _this2.formAddDetalle.detalle.precio * _this2.formAddDetalle.cantidad;
+          _this2.m_afecto = _this2.m_afecto + precio * _this2.formAddDetalle.cantidad;
           _this2.total = Math.round(_this2.m_afecto * 1.19);
           _this2.m_iva = Math.round(_this2.m_afecto * 0.19);
           _this2.modal = false;
@@ -4671,7 +4682,7 @@ __webpack_require__.r(__webpack_exports__);
         };
       }
 
-      if (this.formAddDebito.precio_descuento.length > 0) {
+      if (this.formAddDebito.precio_descuento.length != 0) {
         this.m_afecto = this.m_afecto + this.formAddDebito.precio_descuento * this.formAddDebito.cantidad;
       } else {
         this.m_afecto = this.m_afecto + this.formAddDebito.precio * this.formAddDebito.cantidad;
@@ -6549,6 +6560,7 @@ __webpack_require__.r(__webpack_exports__);
                 showConfirmButton: false
               });
               _this3.form = {
+                idComprobante: _this3.$route.params.codigo,
                 centro: "",
                 cuenta: "",
                 glosa: "",
@@ -6720,7 +6732,7 @@ __webpack_require__.r(__webpack_exports__);
         estado: "",
         mes: ""
       },
-      // tabla  
+      // tabla   
       tableData: [],
       title: "actividad",
       items: [{
@@ -6782,21 +6794,21 @@ __webpack_require__.r(__webpack_exports__);
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
     },
-    aprobar: function aprobar(comprobante) {
+    eliminar: function eliminar(comprobante) {
       var _this = this;
 
       sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
-        title: 'Aprobar Comprobante',
-        text: "¿Esta seguro que quiere aprobar este comprobante?",
-        icon: 'success',
+        title: 'Eliminar Comprobante',
+        text: "¿Esta seguro que quiere eliminar este comprobante?",
+        icon: 'error',
         showCancelButton: true,
         confirmButtonColor: '#0b892c',
         cancelButtonColor: '#d33',
         cancelButtonText: "Cancelar",
-        confirmButtonText: 'Si, aprobar!'
+        confirmButtonText: 'Si, Eliminar!'
       }).then(function (result) {
         if (result.isConfirmed) {
-          _this.axios.get("/api/aprobarComprobante/" + comprobante.id_comprobante).then(function (res) {
+          _this.axios["delete"]("/api/deleteComprobante/" + comprobante.id_comprobante).then(function (res) {
             sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
               icon: 'success',
               title: 'Comprobante',
@@ -6820,49 +6832,11 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    eliminar: function eliminar(comprobante) {
+    Busqueda: function Busqueda() {
       var _this2 = this;
 
-      sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
-        title: 'Eliminar Comprobante',
-        text: "¿Esta seguro que quiere eliminar este comprobante?",
-        icon: 'error',
-        showCancelButton: true,
-        confirmButtonColor: '#0b892c',
-        cancelButtonColor: '#d33',
-        cancelButtonText: "Cancelar",
-        confirmButtonText: 'Si, Eliminar!'
-      }).then(function (result) {
-        if (result.isConfirmed) {
-          _this2.axios["delete"]("/api/deleteComprobante/" + comprobante.id_comprobante).then(function (res) {
-            sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
-              icon: 'success',
-              title: 'Comprobante',
-              text: res.data,
-              timer: 3500,
-              showConfirmButton: false
-            });
-
-            _this2.traerData();
-          })["catch"](function (error) {
-            console.log("error", error);
-            var title = "Error Detalle Comprobante";
-            var message = "Problema al eliminar detalle";
-            var type = "error";
-            _this2.modal = false;
-
-            _this2.$v.form.$reset();
-
-            _this2.successmsg(title, message, type);
-          });
-        }
-      });
-    },
-    Busqueda: function Busqueda() {
-      var _this3 = this;
-
       this.axios.post("/api/buscarComprobantes", this.form).then(function (res) {
-        _this3.tableData = res.data;
+        _this2.tableData = res.data;
         res.data.map(function (p) {
           p["unidad"] = p.unidad_negocio.nombre;
           p["comprobante"] = p.tipo_comprobante.nombre;
@@ -11725,15 +11699,17 @@ __webpack_require__.r(__webpack_exports__);
           });
         } else if (this.typeform == "edit") {
           this.axios.put("/api/actualizarProductoSistema/".concat(this.form.id_producto), this.form).then(function (res) {
-            var title = "Producto";
-            var message = "Producto Actualizado Exitosamente";
-            var type = "success";
-
-            _this2.successmsg(title, message, type);
+            sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+              icon: 'success',
+              title: 'Producto',
+              text: "Producto Actualizado Exitosamente",
+              timer: 1500,
+              showConfirmButton: false
+            });
 
             _this2.$v.form.$reset();
 
-            his.form.id_producto = "";
+            _this2.form.id_producto = "";
             _this2.form.nombre = "";
             _this2.form.descripcion = "";
             _this2.divButton = true;
@@ -11769,45 +11745,30 @@ __webpack_require__.r(__webpack_exports__);
     eliminar: function eliminar(datos) {
       var _this3 = this;
 
-      if (datos.estado == "Activo") {
-        var estado = 2;
-        var title = "Desactivar Docente";
-        var text = "Esta seguro de desativar al Docente ".concat(datos.nombres, " ").concat(datos.apellidos);
-      } else {
-        estado = 1;
-        title = "Activar Docente";
-        text = "Esta seguro de activar el Docente ".concat(datos.nombres, " ").concat(datos.apellidos);
-      }
-
+      console.log(datos);
       sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
-        title: title,
-        text: text,
+        title: "Eliminar Producto",
+        text: "¿Esta seguro que que desea eliminar producto?",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#34c38f",
-        cancelButtonColor: "#f46a6a",
-        confirmButtonText: "Si"
+        confirmButtonColor: "#0b892c",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Cancelar",
+        confirmButtonText: "Si, Aprobar!"
       }).then(function (result) {
-        if (result.value) {
-          _this3.axios["delete"]("/api/eliminarDocente/".concat(datos.id_docente)).then(function (res) {
+        if (result.isConfirmed) {
+          _this3.axios["delete"]("api/eliminarProductoSistema/" + datos.id_producto).then(function (res) {
             console.log(res);
-
-            if (res.data.success) {
-              var message = "Docente ha sido desactivado";
-              var type = "success";
-            } else {
-              if (estado == 1) {
-                message = "Error al activar el subnivel";
-              } else {
-                message = "Error al desactivar el subnivel";
-              }
-
-              type = "error";
-            }
-
-            _this3.successmsg(title, message, type);
-
-            _this3.traerData();
+            return;
+            sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+              icon: 'success',
+              title: 'Pago realizado exitosamente',
+              text: res.data.mensaje,
+              timer: 3500,
+              showConfirmButton: false
+            });
+          })["catch"](function (error) {
+            console.log("error", error);
           });
         }
       });
@@ -69316,13 +69277,21 @@ var render = function () {
                         }),
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "mb-3 col-2" }, [
-                        _c("input", {
-                          staticClass: "form-control form-control-sm",
-                          attrs: { type: "number", readonly: "" },
-                          domProps: { value: item.precio },
-                        }),
-                      ]),
+                      item.precio_descuento == null
+                        ? _c("div", { staticClass: "mb-3 col-2" }, [
+                            _c("input", {
+                              staticClass: "form-control form-control-sm",
+                              attrs: { type: "number", readonly: "" },
+                              domProps: { value: item.precio },
+                            }),
+                          ])
+                        : _c("div", { staticClass: "mb-3 col-2" }, [
+                            _c("input", {
+                              staticClass: "form-control form-control-sm",
+                              attrs: { type: "number", readonly: "" },
+                              domProps: { value: item.precio_descuento },
+                            }),
+                          ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "mb-3 col-2" }, [
                         _c("input", {
@@ -70685,24 +70654,44 @@ var render = function () {
                         _c("p", [_vm._v("$" + _vm._s(detalle.total))]),
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-1" }, [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function ($event) {
-                                return _vm.deleteEvent(
-                                  index,
-                                  detalle.precio * detalle.cantidad
-                                )
+                      detalle.precio_descuento == null
+                        ? _c("div", { staticClass: "col-1" }, [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.deleteEvent(
+                                      index,
+                                      detalle.precio * detalle.cantidad
+                                    )
+                                  },
+                                },
                               },
-                            },
-                          },
-                          [_c("i", { staticClass: "uil uil-trash" })]
-                        ),
-                      ]),
+                              [_c("i", { staticClass: "uil uil-trash" })]
+                            ),
+                          ])
+                        : _c("div", { staticClass: "col-1" }, [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.deleteEvent(
+                                      index,
+                                      detalle.precio_descuento *
+                                        detalle.cantidad
+                                    )
+                                  },
+                                },
+                              },
+                              [_c("i", { staticClass: "uil uil-trash" })]
+                            ),
+                          ]),
                     ]
                   )
                 }),
@@ -70758,24 +70747,44 @@ var render = function () {
                         _c("p", [_vm._v("$" + _vm._s(detalle.total))]),
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "col-1" }, [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-danger btn-sm",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function ($event) {
-                                return _vm.deleteEventDebito(
-                                  index,
-                                  detalle.precio * detalle.cantidad
-                                )
+                      detalle.precio_descuento == null
+                        ? _c("div", { staticClass: "col-1" }, [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.deleteEventDebito(
+                                      index,
+                                      detalle.precio * detalle.cantidad
+                                    )
+                                  },
+                                },
                               },
-                            },
-                          },
-                          [_c("i", { staticClass: "uil uil-trash" })]
-                        ),
-                      ]),
+                              [_c("i", { staticClass: "uil uil-trash" })]
+                            ),
+                          ])
+                        : _c("div", { staticClass: "col-1" }, [
+                            _c(
+                              "button",
+                              {
+                                staticClass: "btn btn-danger btn-sm",
+                                attrs: { type: "button" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.deleteEventDebito(
+                                      index,
+                                      detalle.precio_descuento *
+                                        detalle.cantidad
+                                    )
+                                  },
+                                },
+                              },
+                              [_c("i", { staticClass: "uil uil-trash" })]
+                            ),
+                          ]),
                     ]
                   )
                 }),
@@ -73837,223 +73846,6 @@ var render = function () {
                     ]),
               ]
             ),
-          ]),
-        ]),
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-lg-12" }, [
-        _c("div", { staticClass: "card" }, [
-          _c("div", { staticClass: "card-body" }, [
-            _c("div", { staticClass: "row mt-4" }, [
-              _c("div", { staticClass: "col-sm-12 col-md-6" }, [
-                _c(
-                  "div",
-                  {
-                    staticClass: "dataTables_length",
-                    attrs: { id: "tickets-table_length" },
-                  },
-                  [
-                    _c(
-                      "label",
-                      { staticClass: "d-inline-flex align-items-center" },
-                      [
-                        _vm._v(
-                          "\n                  Mostrar \n                  "
-                        ),
-                        _c("b-form-select", {
-                          attrs: { size: "sm", options: _vm.pageOptions },
-                          model: {
-                            value: _vm.perPage,
-                            callback: function ($$v) {
-                              _vm.perPage = $$v
-                            },
-                            expression: "perPage",
-                          },
-                        }),
-                        _vm._v(" entradas\n                "),
-                      ],
-                      1
-                    ),
-                  ]
-                ),
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-sm-12 col-md-6" }, [
-                _c(
-                  "div",
-                  {
-                    staticClass: "dataTables_filter text-md-end",
-                    attrs: { id: "tickets-table_filter" },
-                  },
-                  [
-                    _c(
-                      "label",
-                      { staticClass: "d-inline-flex align-items-center" },
-                      [
-                        _vm._v(
-                          "\n                  Buscar:\n                  "
-                        ),
-                        _c("b-form-input", {
-                          staticClass: "form-control form-control-sm ms-2",
-                          attrs: { type: "search", placeholder: "Buscar..." },
-                          model: {
-                            value: _vm.filter,
-                            callback: function ($$v) {
-                              _vm.filter = $$v
-                            },
-                            expression: "filter",
-                          },
-                        }),
-                      ],
-                      1
-                    ),
-                  ]
-                ),
-              ]),
-            ]),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "table-responsive mb-0" },
-              [
-                _c("b-table", {
-                  attrs: {
-                    items: _vm.tableData,
-                    fields: _vm.fields,
-                    responsive: "sm",
-                    "per-page": _vm.perPage,
-                    "current-page": _vm.currentPage,
-                    "sort-by": _vm.sortBy,
-                    "sort-desc": _vm.sortDesc,
-                    filter: _vm.filter,
-                    "filter-included-fields": _vm.filterOn,
-                  },
-                  on: {
-                    "update:sortBy": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sort-by": function ($event) {
-                      _vm.sortBy = $event
-                    },
-                    "update:sortDesc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                    "update:sort-desc": function ($event) {
-                      _vm.sortDesc = $event
-                    },
-                    filtered: _vm.onFiltered,
-                  },
-                  scopedSlots: _vm._u([
-                    {
-                      key: "cell(action)",
-                      fn: function (data) {
-                        return [
-                          _c("ul", { staticClass: "list-inline mb-0" }, [
-                            _c(
-                              "li",
-                              { staticClass: "list-inline-item" },
-                              [
-                                _c(
-                                  "router-link",
-                                  {
-                                    attrs: {
-                                      to:
-                                        "../comprobanteDetalle/" +
-                                        data.item.codigo,
-                                    },
-                                  },
-                                  [
-                                    _c(
-                                      "a",
-                                      {
-                                        staticClass: "px-2 text-primary",
-                                        attrs: { title: "Detalle Comprobante" },
-                                      },
-                                      [
-                                        _c("i", {
-                                          staticClass:
-                                            "uil uil-notes font-size-18",
-                                        }),
-                                      ]
-                                    ),
-                                  ]
-                                ),
-                              ],
-                              1
-                            ),
-                            _vm._v(" "),
-                            _c("li", { staticClass: "list-inline-item" }, [
-                              _c(
-                                "a",
-                                {
-                                  directives: [
-                                    {
-                                      name: "b-tooltip",
-                                      rawName: "v-b-tooltip.hover",
-                                      modifiers: { hover: true },
-                                    },
-                                  ],
-                                  staticClass: "px-2 text-danger",
-                                  attrs: {
-                                    href: "javascript:void(0);",
-                                    title: "Eliminar",
-                                  },
-                                  on: {
-                                    click: function ($event) {
-                                      return _vm.eliminar(data.item)
-                                    },
-                                  },
-                                },
-                                [
-                                  _c("i", {
-                                    staticClass: "uil uil-trash font-size-18",
-                                  }),
-                                ]
-                              ),
-                            ]),
-                          ]),
-                        ]
-                      },
-                    },
-                  ]),
-                }),
-              ],
-              1
-            ),
-            _vm._v(" "),
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col" }, [
-                _c(
-                  "div",
-                  {
-                    staticClass:
-                      "dataTables_paginate paging_simple_numbers float-end",
-                  },
-                  [
-                    _c(
-                      "ul",
-                      { staticClass: "pagination pagination-rounded mb-0" },
-                      [
-                        _c("b-pagination", {
-                          attrs: {
-                            "total-rows": _vm.totalRows,
-                            "per-page": _vm.perPage,
-                          },
-                          model: {
-                            value: _vm.currentPage,
-                            callback: function ($$v) {
-                              _vm.currentPage = $$v
-                            },
-                            expression: "currentPage",
-                          },
-                        }),
-                      ],
-                      1
-                    ),
-                  ]
-                ),
-              ]),
-            ]),
           ]),
         ]),
       ]),

@@ -14,7 +14,7 @@
               nav-class="nav-tabs-custom"
               content-class="p-3 text-muted"
             >
-              <b-tab active> 
+              <b-tab active>  
                 <template v-slot:title>
                   <span class="d-inline-block d-sm-none">
                     <i class="fas fa-home"></i>
@@ -281,8 +281,11 @@
               <div class="col-1">
                   <p>${{detalle.total}}</p> 
               </div>
-              <div class="col-1">
+              <div class="col-1" v-if="detalle.precio_descuento == null">
                   <button type="button" class="btn btn-danger btn-sm" v-on:click="deleteEvent(index, detalle.precio*detalle.cantidad)"><i class="uil uil-trash"></i></button>
+              </div>
+              <div class="col-1" v-else>
+                  <button type="button" class="btn btn-danger btn-sm" v-on:click="deleteEvent(index, detalle.precio_descuento*detalle.cantidad)"><i class="uil uil-trash"></i></button>
               </div>
             </div>
 
@@ -311,8 +314,11 @@
               <div class="col-1">
                   <p>${{detalle.total}}</p> 
               </div>
-              <div class="col-1">
+              <div class="col-1" v-if="detalle.precio_descuento == null">
                   <button type="button" class="btn btn-danger btn-sm" v-on:click="deleteEventDebito(index, detalle.precio*detalle.cantidad)"><i class="uil uil-trash"></i></button>
+              </div>
+              <div class="col-1" v-else>
+                  <button type="button" class="btn btn-danger btn-sm" v-on:click="deleteEventDebito(index, detalle.precio_descuento*detalle.cantidad)"><i class="uil uil-trash"></i></button>
               </div>
             </div>
             <hr>

@@ -14,7 +14,7 @@ export default {
         unidades: [],
         productos: [],
         centros: [],
-        detalleDebito: [],
+        detalleDebito: [], 
         detalles: [],
         detalleNotaCredito: [],
         detallesSelect: [],
@@ -423,21 +423,24 @@ methods: {
               });
               return false;
             } 
+
+            var precio = 0;
+            if(this.formAddDetalle.detalle.precio_descuento == null){ precio = this.formAddDetalle.detalle.precio}else{precio = this.formAddDetalle.detalle.precio_descuento}
             
             var data = {'nombre': this.formAddDetalle.detalle.producto.nombre, 
                         'cantidad': this.formAddDetalle.cantidad,
                         'precio': this.formAddDetalle.detalle.precio,
                         'descuento_porcentaje': this.formAddDetalle.detalle.descuento_porcentaje,
                         'precio_descuento': this.formAddDetalle.detalle.precio_descuento,
-                        'total': this.formAddDetalle.detalle.precio*this.formAddDetalle.cantidad,
+                        'total': precio*this.formAddDetalle.cantidad,
                         'id_detalle': this.formAddDetalle.detalle.id_detalle,
                         'producto_id': this.formAddDetalle.detalle.producto_id,
                         'sku': this.formAddDetalle.detalle.sku,
                         'descripcion_adicional': this.formAddDetalle.detalle.descripcion_adicional,
                         'centrocosto_id': this.formAddDetalle.detalle.centrocosto_id,
-                        'existencia_id': res.data.existencia_id};
-
-            this.m_afecto = this.m_afecto+this.formAddDetalle.detalle.precio*this.formAddDetalle.cantidad;
+                        'existencia_id': res.data.existencia_id}; 
+            
+            this.m_afecto = this.m_afecto+precio*this.formAddDetalle.cantidad;
             this.total = Math.round(this.m_afecto*1.19);
             this.m_iva = Math.round(this.m_afecto*0.19);
 
@@ -486,7 +489,7 @@ methods: {
                        };
           }
               
-          if(this.formAddDebito.precio_descuento.length > 0){
+          if(this.formAddDebito.precio_descuento.length != 0){
             this.m_afecto = this.m_afecto+this.formAddDebito.precio_descuento*this.formAddDebito.cantidad;
           }else{
             this.m_afecto = this.m_afecto+this.formAddDebito.precio*this.formAddDebito.cantidad;

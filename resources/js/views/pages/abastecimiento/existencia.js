@@ -20,7 +20,7 @@ export default {
         aprobacion: 0,
         buttonForm: true,
         infoEmpresa: JSON.parse(localStorage.getItem("globalEmpresasSelected")),
-        form: {
+        form: { 
             documento: "",
             empresa: "",
             moverExistencia: [],
@@ -41,6 +41,7 @@ export default {
             .then((res) => {
                 this.form.documento = res.data.info.id_info;
                 this.form.empresa = this.infoEmpresa.id_empresa;
+                console.log(res.data.detalles);
                 this.detalles = res.data.detalles;
                 this.documentoName = res.data.info.documento_tributario.descripcion;
                 var info = {'id_tarjeta': 0, 'nombre': 'Nueva existencia'};

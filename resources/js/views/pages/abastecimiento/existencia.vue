@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 </div>
-            </div>
+            </div> 
  
             <div class="col-lg-12">
                     <div class="card">
@@ -48,8 +48,11 @@
                                     <div class="mb-3 col-1"> 
                                         <input type="number" class="form-control form-control-sm" :value="item.cantidad" readonly>
                                     </div> 
-                                    <div class="mb-3 col-2">
+                                    <div class="mb-3 col-2" v-if="item.precio_descuento == null">
                                         <input type="number" class="form-control form-control-sm" :value="item.precio" readonly >
+                                    </div> 
+                                    <div class="mb-3 col-2" v-else>
+                                        <input type="number" class="form-control form-control-sm" :value="item.precio_descuento" readonly >
                                     </div> 
                                     <div class="mb-3 col-2">
                                         <input type="text" class="form-control form-control-sm" :value="item.total" readonly>

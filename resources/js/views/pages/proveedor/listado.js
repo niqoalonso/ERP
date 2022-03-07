@@ -25,7 +25,7 @@ export default {
       modeSelectProveedor: false,
       divButton: true,
       proveedores: [],
-
+ 
       // tabla
 
       tableData: [],
@@ -147,14 +147,16 @@ export default {
               this.form
             )
             .then((res) => {
-            
-                const title = "Producto";
-                const message = "Producto Actualizado Exitosamente";
-                const type = "success";
-                this.successmsg(title, message, type);
+              Swal.fire({
+                icon: 'success',
+                title: 'Producto',
+                text: "Producto Actualizado Exitosamente",
+                timer: 1500,
+                showConfirmButton: false
+              });
 
                 this.$v.form.$reset();
-                his.form.id_producto = "";
+                this.form.id_producto = "";
                 this.form.nombre = "";
                 this.form.descripcion = "";
 
@@ -198,48 +200,37 @@ export default {
     },
 
     eliminar(datos) {
-      if (datos.estado == "Activo") {
-        var estado = 2;
-        var title = "Desactivar Docente";
-        var text = `Esta seguro de desativar al Docente ${datos.nombres} ${datos.apellidos}`;
-      } else {
-        estado = 1;
-        title = "Activar Docente";
-        text = `Esta seguro de activar el Docente ${datos.nombres} ${datos.apellidos}`;
-      }
-
+      console.log(datos);
       Swal.fire({
-        title: title,
-        text: text,
-        icon: "warning",
+        title: "Eliminar Producto",
+        text:  "¿Esta seguro que que desea eliminar producto?",
+        icon:  "warning",
         showCancelButton: true,
-        confirmButtonColor: "#34c38f",
-        cancelButtonColor: "#f46a6a",
-        confirmButtonText: "Si",
+        confirmButtonColor: "#0b892c",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Cancelar",
+        confirmButtonText: "Si, Aprobar!",
       }).then((result) => {
-        if (result.value) {
-          this.axios
-            .delete(
-              `/api/eliminarDocente/${datos.id_docente}`
-            )
-            .then((res) => {
-              console.log(res);
-              if (res.data.success) {
-                var message = "Docente ha sido desactivado";
-                var type = "success";
-              } else {
-                if (estado == 1) {
-                  message = "Error al activar el subnivel";
-                } else {
-                  message = "Error al desactivar el subnivel";
-                }
-                type = "error";
-              }
+        if (result.isConfirmed) {
+            this.axios
+                .delete(`api/eliminarProductoSistema/`+datos.id_producto)
+                .then((res) => {
+                    
+                    console.log(res);
+                    return;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Pago realizado exitosamente',
+                            text: res.data.mensaje,
+                            timer: 3500,
+                            showConfirmButton: false
+                        });
+                    
 
-              this.successmsg(title, message, type);
-
-              this.traerData();
-            });
+                })
+                .catch((error) => {
+                    console.log("error", error);
+                });
         }
       });
     },

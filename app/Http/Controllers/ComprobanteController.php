@@ -16,7 +16,7 @@ class ComprobanteController extends Controller
 
     public function getInicial($id)
     {
-        $tipo = TipoComprobante::all();
+        $tipo = TipoComprobante::all(); 
         $unidad = UnidadNegocio::where('empresa_id', $id)->get();
         return ['tipos' => $tipo, 'unidad' => $unidad];
     }

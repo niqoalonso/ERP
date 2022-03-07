@@ -38,7 +38,18 @@ class CompraController extends Controller
             if(count($doc->RelacionAntecesor) != 0){
                 $datos =  InfoDocumento::whereIn('documento_id', array_column($doc->RelacionAntecesor->toArray(), 'id_documento'))->where('empresa_id', $empresa)->whereIn('estado_id', [14,16])->get();
                 $datos->load('Encabezado.Proveedor','DocumentoTributario');
-                return ['estado' => 1, 'datos' => $datos, 'documento' => $doc];
+                
+                //ENVIAMOS A UN NUEVO ARRAY SOLO LOS DOCUMENTOS QUE NO TIENE SUCESO QUE SE ESTA QUERIENDO REALIZAR DE NUEVO
+                $data = [];
+                foreach ($datos as $key => $value) {
+                    if(count(InfoDocumento::where('documento_id', $doc->id_documento)->where('empresa_id', $empresa)->whereIn('estado_id', [14,16])->where('encabezado_id', $value->encabezado_id)->get()) == 0)
+                    {
+                        array_push($data, $value);   
+                    }
+                }
+
+            
+                return ['estado' => 1, 'datos' => $data, 'documento' => $doc];
             }else{
                 return ['estado' => 3, 'documento' => $doc];
             }
@@ -201,7 +212,7 @@ class CompraController extends Controller
 
         $comprobante = Comprobante::create([
                 'codigo'            => $this->GenerarCodigo(),
-                'glosa'             => 'Nota de Credito Compra '.$request->n_encabezado,
+                'glosa'             => 'Nota Credito Compra '.$request->n_encabezado,
                 'fecha_comprobante' => $request->f_emision,
                 'empresa_id'        => $request->empresa,
                 'unidadnegocio_id'  => 1,
@@ -217,7 +228,7 @@ class CompraController extends Controller
             'plancuenta_id'     =>  $request->origen['id_plan_cuenta'],
             'centrocosto_id'    => 2,
             'unidadnegocio_id'  => 1,
-            'glosa'             => "Pago Proveedor",
+            'glosa'             => "Pago Origen",
             'debe'              => $data->total_documento,
             'haber'             => 0,
         ]);
@@ -228,7 +239,7 @@ class CompraController extends Controller
             'plancuenta_id'     => $request->destino['id_plan_cuenta'],
             'centrocosto_id'    => 2,
             'unidadnegocio_id'  => 1,
-            'glosa'             => "Pago Detino Proveedor",
+            'glosa'             => "Pago Detino",
             'debe'              => 0,
             'haber'             => $data->total_documento,
         ]);
@@ -250,7 +261,7 @@ class CompraController extends Controller
 
         $comprobante = Comprobante::create([
                 'codigo'            => $this->GenerarCodigo(),
-                'glosa'             => 'Nota de Debito '.$request->n_encabezado,
+                'glosa'             => 'Nota Debito '.$request->n_encabezado,
                 'fecha_comprobante' => $request->f_emision,
                 'empresa_id'        => $request->empresa,
                 'unidadnegocio_id'  => 1, 
@@ -266,7 +277,7 @@ class CompraController extends Controller
             'plancuenta_id'     =>  $request->origen['id_plan_cuenta'],
             'centrocosto_id'    => 2,
             'unidadnegocio_id'  => 1,
-            'glosa'             => "Pago Proveedor",
+            'glosa'             => "Pago Origen",
             'debe'              => 0,
             'haber'             => $data->total_documento,
         ]);
@@ -277,7 +288,7 @@ class CompraController extends Controller
             'plancuenta_id'     => $request->destino['id_plan_cuenta'],
             'centrocosto_id'    => 2,
             'unidadnegocio_id'  => 1,
-            'glosa'             => "Pago Detino Proveedor",
+            'glosa'             => "Pago Detino",
             'debe'              => $data->total_documento,
             'haber'             => 0,
         ]);
@@ -394,6 +405,7 @@ class CompraController extends Controller
                 {
                     foreach ($request->detalles as $key => $value) {
                         $data = Existencia::find($value['existencia_id']);
+                        ($value['precio_descuento'] == null) ? $precio = $value['precio'] : $precio = $value['precio_descuento'];
                         if($data->control_stock-$value['cantidad'] == 0){
                             $data->update(['control_stock' => $data->control_stock-$value['cantidad'], 'stock_estado' => 2]);
                         }else{
@@ -402,9 +414,9 @@ class CompraController extends Controller
                         
 
                         Existencia::create(['fecha'     => $info->fecha_emision,                  'info_id' => $info->id_info,          'encabezado_id' => $info->Encabezado->id_encabezado, 
-                                            'tarjeta_id' => $data->tarjeta_id,                    'tipo_operacion' => 3,                'precio' => $value['precio'], 
+                                            'tarjeta_id' => $data->tarjeta_id,                    'tipo_operacion' => 3,                'precio' => $precio, 
                                             'cant_entrada' => 0,                                  'cant_salida' => $value['cantidad'],  'total_cant' => Existencia::where('tarjeta_id', $data->tarjeta_id)->where('stock_estado', 1)->sum('control_stock'), 
-                                            'total_entrada' => 0,                                 'total_salida' => $value['precio']*$value['cantidad'],                  'total_precio' => intval(Existencia::where('tarjeta_id', $data->tarjeta_id)->pluck('total_precio')->last())-intval($value['precio']*$value['cantidad']), 
+                                            'total_entrada' => 0,                                 'total_salida' => $precio*$value['cantidad'],                  'total_precio' => intval(Existencia::where('tarjeta_id', $data->tarjeta_id)->pluck('total_precio')->last())-intval($precio*$value['cantidad']), 
                                             'control_stock' => 0,                                 'stock_estado' => 0]);
                     }
                 }

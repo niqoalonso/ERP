@@ -182,7 +182,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('obtenerprevision',[AfpController::class,'show']);
     Route::get('validarnombre/{nombre}',[AfpController::class,'validarnombre']);
     Route::post('crearprevision',[AfpController::class,'store']);
-    Route::delete('eliminarprevision/{afp}',[AfpController::class,'destroy']);
+    Route::delete('eliminarprevision/{afp}',[AfpController::class,'destroy']); 
 
     //Proveedor
     Route::get('getGirosProveedor', [ProveedorController::class, 'obtenerGiros']);
@@ -192,7 +192,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('getProductoSistema', [ProductoSistemaController::class, 'getProducto']);
     Route::post('crearProductosistema', [ProductoSistemaController::class, 'storeProducto']);
-    Route::put('actualizarProductoSistema/{id}', [ProductoSistemaController::class, 'getProductoProveedor']);
+    Route::put('actualizarProductoSistema/{id}', [ProductoSistemaController::class, 'updateProducto']);
+    Route::delete('eliminarProductoSistema/{id}', [ProductoSistemaController::class, 'deleteProducto']);
 
     //ProductoProveedor
     Route::get('getProveedor', [ProductoProveedorController::class, 'obtenerProveedores']);

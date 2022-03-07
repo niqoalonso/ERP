@@ -64,10 +64,10 @@ class ExistenciaController extends Controller
 
             if($tarjeta)
             {   
-                $data = array('id_detalle' => $value->id_detalle, 'nombre' => $value->Producto->nombre, 'cantidad' => $value->cantidad, 'precio' => $value->precio, 'total' => $value->total, 'tarjeta' => 1, 'producto_id' => $value->producto_id);
+                $data = array('id_detalle' => $value->id_detalle, 'nombre' => $value->Producto->nombre, 'cantidad' => $value->cantidad, 'precio' => $value->precio, 'precio_descuento' => $value->precio_descuento, 'total' => $value->total, 'tarjeta' => 1, 'producto_id' => $value->producto_id);
                 array_push($detalles, $data);
             }else{
-                $data = array('id_detalle' => $value->id_detalle,'nombre' => $value->Producto->nombre, 'cantidad' => $value->cantidad, 'precio' => $value->precio, 'total' => $value->total, 'tarjeta' => 2, 'producto_id' => $value->producto_id);
+                $data = array('id_detalle' => $value->id_detalle,'nombre' => $value->Producto->nombre, 'cantidad' => $value->cantidad, 'precio' => $value->precio, 'precio_descuento' => $value->precio_descuento, 'total' => $value->total, 'tarjeta' => 2, 'producto_id' => $value->producto_id);
                 array_push($detalles, $data);
             }
 
@@ -83,24 +83,26 @@ class ExistenciaController extends Controller
 
         foreach($info->DetalleDocumento as $key => $value)
         {   
-  
+            
             $tarjeta = TarjetaProducto::where('producto_id', $value->producto_id)->where('empresa_id', $request->empresa)->first();
+            $precio = 0;
+            if($value->precio_descuento == null){$precio = $value->precio;}else{$precio = $value->precio_descuento;}
             
             if($tarjeta)
             {   
                 
                 Existencia::create(['fecha' => $info->fecha_emision,  'info_id' => $info->id_info,    'encabezado_id' => $info->Encabezado->id_encabezado, 
-                                                'tarjeta_id' => $tarjeta->id_tarjeta,                   'tipo_operacion' => 1,          'precio' => $value->precio, 
+                                                'tarjeta_id' => $tarjeta->id_tarjeta,                   'tipo_operacion' => 1,          'precio' => $precio, 
                                                 'cant_entrada' => $value->cantidad,                   'cant_salida' => 0,             'total_cant' => Existencia::where('tarjeta_id', $tarjeta->id_tarjeta)->where('stock_estado', 1)->sum('control_stock')+$value->cantidad, 
-                                                'total_entrada' => $value->precio*$value->cantidad, 'total_salida' => 0,            'total_precio' => intval(Existencia::where('tarjeta_id', $tarjeta->id_tarjeta)->pluck('total_precio')->last())+intval($value->precio*$value->cantidad), 
+                                                'total_entrada' => $precio*$value->cantidad, 'total_salida' => 0,            'total_precio' => intval(Existencia::where('tarjeta_id', $tarjeta->id_tarjeta)->pluck('total_precio')->last())+intval($precio*$value->cantidad), 
                                                 'control_stock' => $value->cantidad,                  'stock_estado' => 1]);
             }else{
 
                 $tarjeta =  TarjetaProducto::create(['sku' => $this->GenerarCodigo(), 'nombre' =>  $request->nombreTarjeta[$value->id_detalle], 'empresa_id' => $request->empresa, 'producto_id' => $value->producto_id]);
                             Existencia::create(['fecha' => $info->fecha_emision,                        'info_id' => $info->id_info,    'encabezado_id' => $info->Encabezado->id_encabezado, 
-                                                'tarjeta_id' => $tarjeta->id_tarjeta,                   'tipo_operacion' => 1,          'precio' => $value->precio, 
+                                                'tarjeta_id' => $tarjeta->id_tarjeta,                   'tipo_operacion' => 1,          'precio' => $precio, 
                                                 'cant_entrada' => $value->cantidad,                   'cant_salida' => 0,               'total_cant' => $value->cantidad, 
-                                                'total_entrada' => $value->precio*$value->cantidad, 'total_salida' => 0,                'total_precio' => $value->precio*$value->cantidad, 
+                                                'total_entrada' => $precio*$value->cantidad, 'total_salida' => 0,                'total_precio' => $precio*$value->cantidad, 
                                                 'control_stock' => $value->cantidad,                  'stock_estado' => 1]);
  
             }

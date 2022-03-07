@@ -24,7 +24,7 @@
                       :class="{
                       'is-invalid': submitted && $v.form.nombre.$error,
                       }"
-                  />
+                  /> 
                   <div 
                       v-if="submitted && $v.form.nombre.$error"
                       class="invalid-feedback"

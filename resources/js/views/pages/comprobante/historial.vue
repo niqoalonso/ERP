@@ -27,7 +27,7 @@
                             :options="estados"
                             track-by="id"
                             :custom-label="customLabel"
-                        ></multiselect>
+                        ></multiselect> 
                 </div>
             </div>
             <div class="col-2">

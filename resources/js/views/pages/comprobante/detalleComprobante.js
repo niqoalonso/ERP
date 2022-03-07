@@ -11,7 +11,7 @@ export default {
     Layout,
     Multiselect,
     Swal,
-  },
+  }, 
   data() {
     return {
       urlbackend: this.$urlBackend,
@@ -159,8 +159,6 @@ export default {
               return p;
             });
 
-         
-
             this.cuentas = response.data.cuentas;
             this.centros = response.data.centros;
             this.form.unidad = '('+response.data.info.unidad_negocio.codigo+') '+response.data.info.unidad_negocio.nombre;
@@ -222,6 +220,7 @@ export default {
                 });
 
                 this.form = {
+                    idComprobante: this.$route.params.codigo,
                     centro: "",
                     cuenta: "",
                     glosa: "",

@@ -81,9 +81,12 @@ class TesoreriaController extends Controller
         }
 
         if($request->existe_ncredito == 1){
+
+            $notacredito = InfoDocumento::where('encabezado_id', $data->id_encabezado)->where('documento_id', 4)->first();
+
             $comprobante = Comprobante::create([
                 'codigo'            => $this->GenerarCodigo(),
-                'glosa'             => 'Pago de Factura de Compra '.$request->n_encabezado,
+                'glosa'             => 'Pago Factura Compra '.$request->n_encabezado,
                 'fecha_comprobante' => $request->f_emision,
                 'empresa_id'        => $request->empresa,
                 'unidadnegocio_id'  => 1,
@@ -110,11 +113,12 @@ class TesoreriaController extends Controller
                 'plancuenta_id'     => $request->destino['id_plan_cuenta'],
                 'centrocosto_id'    => 2,
                 'unidadnegocio_id'  => 1,
-                'glosa'             => "Pago Proveedores",
+                'glosa'             => "Pago Destino",
                 'debe'              => $request->monto_pagar,
                 'haber'             => 0,
             ]);
             
+            $notacredito->update(['estado_id' => 14]);
         }else{  
 
             $comprobante = Comprobante::create([
@@ -124,7 +128,7 @@ class TesoreriaController extends Controller
                 'empresa_id'        => $request->empresa,
                 'unidadnegocio_id'  => 1,
                 'tipocomprobante_id' => 2,
-                'estado_id'         => 3,
+                'estado_id'         => 13,
                 'haber'             => $factura->total_documento ,
                 'deber'             => $factura->total_documento
         ]);
@@ -146,7 +150,7 @@ class TesoreriaController extends Controller
             'plancuenta_id'     => $request->destino['id_plan_cuenta'],
             'centrocosto_id'    => 2,
             'unidadnegocio_id'  => 1,
-            'glosa'             => "Pago Proveedores",
+            'glosa'             => "Pago Destino",
             'debe'              => $factura->total_documento,
             'haber'             => 0,
         ]);

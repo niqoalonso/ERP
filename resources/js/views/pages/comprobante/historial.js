@@ -23,7 +23,7 @@ export default {
         mes: "",
         
       },
-      // tabla  
+      // tabla   
 
       tableData: [],
 
@@ -101,48 +101,6 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
-    },
-
-    aprobar(comprobante)
-    {   
-        Swal.fire({
-            title: 'Aprobar Comprobante',
-            text: "¿Esta seguro que quiere aprobar este comprobante?",
-            icon: 'success',
-            showCancelButton: true,
-            confirmButtonColor: '#0b892c',
-            cancelButtonColor: '#d33',
-            cancelButtonText: "Cancelar",
-            confirmButtonText: 'Si, aprobar!',
-          }).then((result) => { 
-            if (result.isConfirmed) {
-                this.axios
-                .get(`/api/aprobarComprobante/`+comprobante.id_comprobante)
-                .then((res) => {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Comprobante',
-                    text: res.data,
-                    timer: 3500,
-                    showConfirmButton: false
-                  });
-            
-                  this.traerData();
-                    
-                })
-                .catch((error) => {
-                  console.log("error", error);
-                  const title = "Error Detalle Comprobante";
-                  const message = "Problema al eliminar detalle";
-                  const type = "error";
-    
-                  this.modal = false;
-                  this.$v.form.$reset();
-    
-                  this.successmsg(title, message, type);
-                });
-            }
-        });
     },
 
     eliminar(comprobante)

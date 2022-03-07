@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-body" v-if="divDocumentoDisponible === true">
                         <div class="row">
-                            <h6>{{mensajeError}}</h6>
+                            <h6>{{mensajeError}}</h6> 
                         </div>
                     </div> 
                     <div class="card-body" v-else>
@@ -43,7 +43,7 @@
                                         ></b-form-input>
                                     </label>
                                 </div>
-                            </div>
+                            </div> 
                         </div>
                         <div class="table-responsive mb-0">
                             <b-table

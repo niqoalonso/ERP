@@ -34,7 +34,7 @@ class CompraController extends Controller
         $doc = DocumentoTributario::where('tipo', $tipo)->first();
         
         if($doc->requiere_antecesor == 1)
-        {   
+        {  
             if(count($doc->RelacionAntecesor) != 0){
                 $datos =  InfoDocumento::whereIn('documento_id', array_column($doc->RelacionAntecesor->toArray(), 'id_documento'))->where('empresa_id', $empresa)->whereIn('estado_id', [14,16])->get();
                 $datos->load('Encabezado.Proveedor','DocumentoTributario');

@@ -8,11 +8,11 @@ export default {
       Multiselect
     },
     data() {
-      return {    
+      return {     
         proveedores: [],
         unidades: [],
         typeform: "create", 
-        buttonForm: true,
+        buttonForm: true, 
         infoEmpresa: JSON.parse(localStorage.getItem("globalEmpresasSelected")),
         documentoName: "",
         documentSelectName: "",
